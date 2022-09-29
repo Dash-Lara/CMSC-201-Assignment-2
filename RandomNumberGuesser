@@ -1,0 +1,132 @@
+import java.util.Scanner;
+public class RandomNumberGuesser {
+//	 Class: CMSC203 CRN 21076
+//	 Program: Assignment 2
+//	 Instructor: Khandan Monshi	
+//	 Summary of Description: A program to have a user guess an integer
+//
+//	 Due Date: 09/28/2022
+//	 Integrity Pledge: I, Dashawna Lara, pledge that I, Dashawna Lara, have completed the programming assignment independently.
+//	 I, Dashawna Lara, have not copied the code from a student or any source.
+
+	//Variables to hold the users lowest and highest guess
+	//Initialized to 1 and 100 because the user should initially be guessing between 1 and 100
+	static int lowGuess = 1;
+	static int highGuess = 100;
+	
+	//For holding guess given by user
+	static int userGuess = 0;
+	//For holding the random integer
+	static 	int randInt = 0;
+	
+	//Boolean values 
+	static boolean isValid = true;//Holds the answer from the inputValidation method in the RNG class
+	static boolean correctGuess = false;//Holds the answer from the isGuessCorrect method in the RNG class
+
+	
+	//Scanner object for getting user input
+	public static final Scanner input = new Scanner(System.in);
+	
+	
+	
+	public static void main(String[] args) {
+		//String variable for holding the answer from the user when asked if they wish to try again
+		String tryAgain = "";
+		
+		//Getting the random int
+		randInt = RNG.rand();
+		System.out.println(randInt);
+		//Explaining to the user what the program does
+		System.out.println("This application generates a random integer between 1 and 100 and"
+				+ " asks the user to guess repeatedly until they guess correctly.");
+		
+		
+		//correctGuess = RNG.isGuessCorrect(userGuess, randInt);
+		
+		do {//Do-while loop to continue guessing with random integers while the user enters yes
+			
+			getFirstGuess();//Getting the users first guess
+			tryingToGuess();//Determines if the users guess is too low, too high, or invalid
+			correctGuess = RNG.isGuessCorrect(userGuess, randInt);//correctGuess is true or false based on whether or not guess is correct
+			
+			while(RNG.getCount() <= 6 && isValid && !correctGuess) {//If the user guess is valid,is not correct, and their count is less than 7
+				getUserGuess();//Getting guess from the user
+				correctGuess = RNG.isGuessCorrect(userGuess, randInt);
+				tryingToGuess();
+			}
+			
+			if(correctGuess) {//If the guess is correct
+				System.out.println("Try again?(Yes or No): ");//Prompting user
+				input.nextLine();//Collecting whitespace character
+				tryAgain = input.nextLine();//Collecting user input
+				if(tryAgain.equalsIgnoreCase("Yes")) {
+					resetGame();//Reseting the game 
+				}
+			}
+		}while(tryAgain.equalsIgnoreCase("Yes"));//While the user wants to try again
+		
+		//If the user doesn't want to try again we thank them for playing
+		if(tryAgain.equalsIgnoreCase("No")) {
+			System.out.println("Thanks for playing...");
+			System.out.println("Programmer: Dashawna Lara");
+		}
+		
+		//If the user exceeds the amount of guesses without guessing correctly 
+		if(RNG.getCount() == 7 && !correctGuess) {
+			System.out.println("You have exceeded the maximum number of guesses. Try again");
+			System.out.println("Programmer: Dashawna Lara");
+		}
+	}
+	
+	//Asking the user to enter their first guess if guessCount is 0
+	public static void getFirstGuess() {
+		if(RNG.getCount() == 0) {
+			System.out.println("Enter your first guess: ");//Prompting user
+			userGuess = input.nextInt();//Receiving input
+			isValid = RNG.inputValidation(userGuess, lowGuess, highGuess);//Validating input
+			while(!isValid) {//If the input isn't valid the users is prompted to guess again until their input is valid
+				userGuess = input.nextInt();
+				isValid = RNG.inputValidation(userGuess, lowGuess, highGuess);
+			}
+		}
+	}
+		
+	//Getting the guess from the user
+	public static void getUserGuess() {
+		System.out.println("Enter your next guess between " + lowGuess + " and " + highGuess + ": ");//Prompting user
+		userGuess = input.nextInt();//Receiving the users guess
+		isValid = RNG.inputValidation(userGuess, lowGuess, highGuess);//Validating input
+		while(!isValid) {//If the input isn't valid the users is prompted to guess again until their input is valid
+			userGuess = input.nextInt();
+			isValid = RNG.inputValidation(userGuess, lowGuess, highGuess);
+		}
+	}
+		
+		
+	//Method to determine if the users guess is too high or too low 
+	public static void tryingToGuess() {
+		//If the users guess is too high program will tell them and put the users guess into highGuess
+		if(randInt < userGuess) {
+			System.out.println("Your guess is too high");//Telling the user their guess is too high
+			System.out.println("Number of guesses is: " + RNG.getCount()); //Tells the user the amount of guesses they have used
+			highGuess = userGuess;//The users guess is put into highGuess
+		}
+		else if(randInt > userGuess) {
+			//If the users guess is too low program will tell them and put the users guess into lowGuess
+			System.out.println("Your guess is too low");//Telling user their guess is too low
+			System.out.println("Number of guesses is: " + RNG.getCount());//Tells the user the amount of guess they have used
+			lowGuess = userGuess;//The users guess is put into lowGuess
+		}
+	}
+	
+	//Method to reset game if the user wants to try again
+	public static void resetGame() {
+		RNG.resetCount();//Reseting the count
+		randInt = RNG.rand();//Getting a new random integer
+		correctGuess = false;//Making correctGuess false so it can become true once the user guesses correctly 
+		lowGuess = 1; //Reseting lowGuess to 1 as it was originally
+		highGuess = 100;//Reseting highGuess to 100 as it was originally
+	}
+	
+	
+}
